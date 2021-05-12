@@ -29,7 +29,7 @@ const usuariosPut =  (req, res) => {
         msg: 'put API',
         id
     });
-}
+}   
 
 const usuariosDelete = (req, res) => {
     res.json({
