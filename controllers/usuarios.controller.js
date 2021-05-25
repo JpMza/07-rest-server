@@ -35,7 +35,7 @@ const usersPost = async (req, res) => {
 
 const usuariosPut = async (req, res) => {
     const { id } = req.params;
-    const { password, email ,google, ...rest } = req.body;
+    const {_id, password, email ,google, ...rest } = req.body;
 
     //TODO valudar contra db
 
@@ -44,11 +44,10 @@ const usuariosPut = async (req, res) => {
         rest.password = bcrypt.hashSync(password, salt);
     }
 
-    await Usuario.findByIdAndUpdate(id, rest);
-    const userUpdated = await Usuario.findById(id);
+    const user = await Usuario.findByIdAndUpdate(id, rest);
     res.json({
         msg: 'put API',
-        userUpdated
+        user
     });
 }
 
