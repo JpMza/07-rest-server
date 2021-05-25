@@ -2,40 +2,38 @@ const { response, request } = require('express');
 const Usuario = require('../models/usuarios');
 const bcrypt = require('bcryptjs');
 
-const usuariosGet = (req, res) => {
+const usuariosGet = async (req, res) => {
 
-    const { id, nombre = "No name", page = 1, apk } = req.query;
+    const { limit = 10, from = 0 } = req.query;
+    const query = { status: true }
 
-    res.json({
-        msg: 'get API - controlador',
-        id,
-        nombre,
-        apk,
-        page
-    })
+    const [total, usuarios] = await Promise.all([
+        Usuario.countDocuments(query),
+        Usuario.find(query)
+            .skip(Number(from))
+            .limit(Number(limit))
+    ])
+
+    res.json({ total, usuarios });
 }
 
 const usersPost = async (req, res) => {
 
     const { name, email, password, role } = req.body
-    const usuario = new Usuario({ name, email, password, role });
+    const user = new Usuario({ name, email, password, role });
 
     //Encriptar contraseña
     const salt = bcrypt.genSaltSync();
-    usuario.password = bcrypt.hashSync(password, salt);
+    user.password = bcrypt.hashSync(password, salt);
 
-    await usuario.save();
+    await user.save();
 
-
-    res.status(201).json({
-        msg: 'post API',
-        usuario
-    });
+    res.status(201).json(user);
 }
 
 const usuariosPut = async (req, res) => {
     const { id } = req.params;
-    const {_id, password, email ,google, ...rest } = req.body;
+    const { _id, password, email, google, ...rest } = req.body;
 
     //TODO valudar contra db
 
@@ -51,9 +49,18 @@ const usuariosPut = async (req, res) => {
     });
 }
 
-const usuariosDelete = (req, res) => {
+const usuariosDelete = async (req, res) => {
+
+    const { id } = req.params;
+
+    //Physical delete
+    //const user = await Usuario.findByIdAndDelete(id)
+
+    const user = await Usuario.findByIdAndUpdate(id, {status : false})
+
     res.json({
-        msg: 'delete API'
+        msg: 'delete API',
+        user
     });
 }
 
