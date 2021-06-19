@@ -1,5 +1,5 @@
 const { response, request } = require('express');
-const Usuario = require('../models/usuarios');
+const Usuario = require('../models/user');
 const bcrypt = require('bcryptjs');
 
 const usuariosGet = async (req, res) => {
@@ -53,14 +53,16 @@ const usuariosDelete = async (req, res) => {
 
     const { id } = req.params;
 
+    const { uid } = req.uid;
+
     //Physical delete
     //const user = await Usuario.findByIdAndDelete(id)
 
-    const user = await Usuario.findByIdAndUpdate(id, {status : false})
-
+    const user = await Usuario.findByIdAndUpdate(id, { status: false })
+    const userLogged = req.user
     res.json({
-        msg: 'delete API',
-        user
+        user,
+        userLogged
     });
 }
 
