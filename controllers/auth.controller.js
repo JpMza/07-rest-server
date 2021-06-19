@@ -6,38 +6,37 @@ const { generateJWT } = require('../helpers/jwt-generator');
 
 const login = async (req, res) => {
 
-    const { email, password } = req.body
+  const { email, password } = req.body
 
-    try {
+  try {
 
-        const user = await Usuario.findOne({ email });
+    const user = await Usuario.findOne({ email });
 
-        if ( !user ){
-          return res.status(400).json({msg: 'El usuario no existe'})
-        }
-
-        if ( !user.status ){
-          return res.status(400).json({msg: 'El usuario no está activo'})
-        }
-
-        const validPassword = bcrypt.compareSync(password, user.password);
-        if(!validPassword){
-          return res.status(400).json({msg: 'La contraseña es incorrecta'})
-        }
-
-        const token = await generateJWT(user.id);
-        console.log(token)
-        res.status(200).json({user, token});
-        
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            msg: 'Hable con el administrador'
-        })
+    if (!user) {
+      return res.status(400).json({ msg: 'El usuario no existe' })
     }
+
+    if (!user.status) {
+      return res.status(400).json({ msg: 'El usuario no está activo' })
+    }
+
+    const validPassword = bcrypt.compareSync(password, user.password);
+    if (!validPassword) {
+      return res.status(400).json({ msg: 'La contraseña es incorrecta' })
+    }
+
+    const token = await generateJWT(user.id);
+    res.status(200).json({ user, token });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      msg: 'Hable con el administrador'
+    })
+  }
 
 }
 
 module.exports = {
-    login
+  login
 }
