@@ -53,6 +53,8 @@ const usuariosDelete = async (req, res) => {
 
     const { id } = req.params;
 
+    const {uid} = req.uid;
+
     //Physical delete
     //const user = await Usuario.findByIdAndDelete(id)
 
@@ -60,7 +62,8 @@ const usuariosDelete = async (req, res) => {
 
     res.json({
         msg: 'delete API',
-        user
+        user,
+        uid
     });
 }
 
