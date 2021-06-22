@@ -1,8 +1,9 @@
 const { response, request } = require('express');
-const Usuario = require('../models/user');
+const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const { validateFields } = require('../middlewares/fields-validation');
 const { generateJWT } = require('../helpers/jwt-generator');
+const { verifyGoogle } = require('../helpers/google-verify');
 
 const login = async (req, res) => {
 
@@ -10,7 +11,7 @@ const login = async (req, res) => {
 
   try {
 
-    const user = await Usuario.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({ msg: 'El usuario no existe' })
@@ -37,13 +38,45 @@ const login = async (req, res) => {
 
 }
 
-const googleSignIn = (req, res = response) => {
-  const {id_token} = req.body 
+const googleSignIn = async (req, res = response) => {
+  const { id_token } = req.body
 
-  res.json({
-    msg: 'Google',
-    id_token
-  })
+  try {
+
+    const { name, img, email } = await verifyGoogle(id_token);
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      const data = {
+        name,
+        email,
+        password: ':P',
+        img,
+        google: true
+      }
+
+      user = new User(data);
+      await user.save();
+    }
+
+    if (!user.status){
+      return res.status(401).json({
+        msg: 'Hable con el administrador'
+      })
+    }
+
+    const token = await generateJWT(user.id);
+
+      res.json({
+        msg: 'Google',
+        user,
+        token
+      })
+  } catch (error) {
+    res.status(400).json({ msg: 'Token de Google no reconocido' })
+  }
+
+
 }
 
 module.exports = {
