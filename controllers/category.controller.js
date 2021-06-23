@@ -47,8 +47,30 @@ const createCategory = async (req = request, res = response) => {
     res.status(200).json(category);
 }
 
+const updateCategory = async (req = request, res = response) => {
+    let { id } = req.params;
+
+    let data = {
+        name: req.body.name.toUpperCase()
+    }
+
+    const categoryUpdated = await Category.findByIdAndUpdate(id, data);
+
+    categoryUpdated.save()
+    res.status(200).json(categoryUpdated);
+}
+
+const deleteCategory = async (req, res = response) => {
+    let { id } = req.params;
+
+    const categorySetAsInactive = await Category.findByIdAndUpdate(id, { active: false });
+
+    res.status(200).json({ categorySetAsInactive });
+}
 module.exports = {
     getCategories,
     getCategoryById,
-    createCategory
+    createCategory,
+    updateCategory,
+    deleteCategory
 }

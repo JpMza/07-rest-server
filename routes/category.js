@@ -1,6 +1,6 @@
 const { Router, response } = require('express');
 const { check } = require('express-validator');
-const { createCategory, getCategories, getCategoryById } = require('../controllers/category.controller');
+const { createCategory, getCategories, getCategoryById, updateCategory, deleteCategory } = require('../controllers/category.controller');
 const { categoryExistById } = require('../helpers/db-validator');
 const {
     validateFields,
@@ -21,15 +21,21 @@ router.post('/', [
     validateJWT,
     check('name', 'El nombre es requerido').notEmpty(),
     validateFields],
-    createCategory)
+    createCategory);
 
-router.put('/:id', (req, res) => {
-    res.json({ msg: 'put' })
-})
+router.put('/:id', [
+    validateJWT,
+    check('id', 'No es un id valido').isMongoId(),
+    check('id').custom(categoryExistById),
+    validateFields],
+    updateCategory);
 
-router.delete('/', (req, res) => {
-    res.json({ msg: ' delete' })
-})
+router.delete('/:id', [
+    validateJWT,
+    check('id', 'No es un id valido').isMongoId(),
+    check('id').custom(categoryExistById),
+    validateFields],
+    deleteCategory);
 
 
 
