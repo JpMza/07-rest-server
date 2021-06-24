@@ -1,6 +1,7 @@
-const { Category } = require('../models');
-const Role = require('../models/role');
-const User = require('../models/user');
+const { Role,
+    Product,
+    Category,
+    User } = require('../models');
 
 const isValidRole = async (role = '') => {
 
@@ -32,8 +33,34 @@ const categoryExistById = async (id) => {
     const categoryExist = await Category.findById(id);
     if (!categoryExist) {
         throw new Error(`No existe la categoria con id ${id}`)
-    }else if(categoryExist && !categoryExist.active){
+    } else if (categoryExist && !categoryExist.active) {
         throw new Error(`La categoria ${categoryExist.name} existe pero no está activa`)
+    }
+}
+
+const productExistByName = async (name) => {
+    const productInDb = await Product.findOne({ name });
+
+    if (productInDb) {
+        throw new Error(`El producto ${productInDb.name} ya existe`)
+    }
+}
+
+const productExistById = async (id) => {
+    const productInDb = await Product.findOne({ id });
+
+    if (productInDb) {
+        throw new Error(`El producto ${productInDb.name} ya existe`)
+    }
+}
+
+const productAlreadyDeleted = async (id) => {
+    const productInDb = await Product.findById(id);
+
+    if (!productInDb) {
+        throw new Error(`No se encontró el producto ${id} `)
+    } else if (!productInDb.active) {
+        throw new Error(`El producto id: ${id} ya se encuentra inactivo`)
     }
 }
 
@@ -41,5 +68,8 @@ module.exports = {
     isValidRole,
     isEmailRepeated,
     userExistById,
-    categoryExistById
+    categoryExistById,
+    productExistByName,
+    productExistById,
+    productAlreadyDeleted
 }
