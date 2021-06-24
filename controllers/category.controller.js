@@ -7,21 +7,21 @@ const getCategories = async (req, res = response) => {
     let query = { active: true }
     const [categories, total] = await Promise.all([
         Category.find(query)
+            .populate('user', 'name')
             .skip(Number(from))
             .limit(Number(limit)),
         Category.countDocuments(query)]
     )
 
-    return res.status(200).json({ categories, Total: total })
+    return res.status(200).json({ categories, total })
 
 }
 
 const getCategoryById = async (req, res = response) => {
 
     let { id } = req.params;
-    console.log(id);
 
-    const categoryDb = await Category.findById(id);
+    const categoryDb = await Category.findById(id).populate('user', 'name');
     return res.status(200).json(categoryDb)
 }
 
@@ -51,22 +51,22 @@ const updateCategory = async (req = request, res = response) => {
     let { id } = req.params;
 
     let data = {
-        name: req.body.name.toUpperCase()
+        name: req.body.name.toUpperCase(),
+        user: req.user._id
     }
 
-    const categoryUpdated = await Category.findByIdAndUpdate(id, data);
+    const categoryUpdated = await Category.findByIdAndUpdate(id, data).populate('user', 'name');
 
-    categoryUpdated.save()
     res.status(200).json(categoryUpdated);
 }
 
 const deleteCategory = async (req, res = response) => {
     let { id } = req.params;
-
     const categorySetAsInactive = await Category.findByIdAndUpdate(id, { active: false });
 
     res.status(200).json({ categorySetAsInactive });
 }
+
 module.exports = {
     getCategories,
     getCategoryById,
