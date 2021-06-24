@@ -1,5 +1,6 @@
+const { Category } = require('../models');
 const Role = require('../models/role');
-const Usuario = require('../models/user');
+const User = require('../models/user');
 
 const isValidRole = async (role = '') => {
 
@@ -11,7 +12,7 @@ const isValidRole = async (role = '') => {
 
 const isEmailRepeated = async (email = '') => {
 
-    const mailExist = await Usuario.findOne({ email });
+    const mailExist = await User.findOne({ email });
     if (mailExist) {
         throw new Error(`El correo: ${email} ya está registrado`)
     }
@@ -20,15 +21,25 @@ const isEmailRepeated = async (email = '') => {
 
 const userExistById = async (id) => {
 
-    const userExist = await Usuario.findById(id);
+    const userExist = await User.findById(id);
     if (!userExist) {
         throw new Error(`El usuario con el id: ${id} no existe`)
     }
 
 }
 
+const categoryExistById = async (id) => {
+    const categoryExist = await Category.findById(id);
+    if (!categoryExist) {
+        throw new Error(`No existe la categoria con id ${id}`)
+    }else if(categoryExist && !categoryExist.active){
+        throw new Error(`La categoria ${categoryExist.name} existe pero no está activa`)
+    }
+}
+
 module.exports = {
     isValidRole,
     isEmailRepeated,
-    userExistById
+    userExistById,
+    categoryExistById
 }
