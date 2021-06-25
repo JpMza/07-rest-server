@@ -30,15 +30,11 @@ const getProductById = async (req, res = response) => {
 
 const createProduct = async (req = request, res = response) => {
 
-    const { name, price, description, avaliable, category } = req.body
-
+    const { active, ...productData } = req.body
     const data = {
-        name,
-        price,
-        description,
-        avaliable,
+        ...productData,
+        name: productData.name.toUpperCase(),
         user: req.user._id,
-        category
     };
 
     const product = new Product(data);
@@ -50,20 +46,30 @@ const createProduct = async (req = request, res = response) => {
 const updateProduct = async (req = request, res = response) => {
     let { id } = req.params;
 
-    let { name, price, description, avaliable = true, category } = req.body;
+    let { active, avaliable = true, ...productData } = req.body;
     let user = req.user._id;
     let data = {
-        name,
-        price,
-        description,
+        ...productData,
+        name: productData.name.toUpperCase(),
         avaliable,
-        category,
         user
     }
 
-    const productUpdated = await Product.findByIdAndUpdate(id, data).populate('user', 'name').populate('category', 'name');
+    const productUpdated = await Product.findByIdAndUpdate(id, data)
+        .populate('user', 'name')
+        .populate('category', 'name');
 
     res.status(200).json(productUpdated);
+}
+
+const uptadteProductToAvaliable = async (req, res = response) => {
+
+    let { id } = req.params;
+
+    const product = await Product.findByIdAndUpdate(id, { avaliable: true });
+
+    res.status(200).json({ product })
+
 }
 
 const deleteProduct = async (req, res = response) => {
@@ -78,5 +84,6 @@ module.exports = {
     getProductById,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    uptadteProductToAvaliable
 }
