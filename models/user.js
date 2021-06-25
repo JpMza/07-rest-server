@@ -23,7 +23,7 @@ const UserSchema = Schema({
         default: 'ROLE_USER',
         required: true
     },
-    status: {
+    active: {
         type: Boolean,
         default: true
     },

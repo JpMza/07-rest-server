@@ -30,6 +30,7 @@ const userExistById = async (id) => {
 }
 
 const categoryExistById = async (id) => {
+    
     if (!id) {
         throw new Error('La categoria es requerida');
     }
@@ -43,6 +44,7 @@ const categoryExistById = async (id) => {
 }
 
 const productExistByName = async (name) => {
+
     const productInDb = await Product.findOne({ name });
 
     if (productInDb) {
@@ -51,6 +53,7 @@ const productExistByName = async (name) => {
 }
 
 const productExistById = async (id) => {
+
     const productInDb = await Product.findOne({ id });
 
     if (productInDb) {
@@ -59,6 +62,7 @@ const productExistById = async (id) => {
 }
 
 const productAlreadyDeleted = async (id) => {
+
     const productInDb = await Product.findById(id);
 
     if (!productInDb) {
