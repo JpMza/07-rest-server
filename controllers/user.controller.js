@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const usersGet = async (req, res) => {
 
     const { limit = 10, from = 0 } = req.query;
-    const query = { status: true }
+    const query = { active: true }
 
     const [total, users] = await Promise.all([
         User.countDocuments(query),
@@ -52,7 +52,7 @@ const usersDelete = async (req, res) => {
     //Physical delete
     //const user = await Usuario.findByIdAndDelete(id)
 
-    const user = await User.findByIdAndUpdate(id, { status: false })
+    const user = await User.findByIdAndUpdate(id, { active: false })
     const userLogged = req.user
     res.json({
         user,
