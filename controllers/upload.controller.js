@@ -4,7 +4,6 @@ const { v4: uuidv4 } = require('uuid');
 
 const uploadFile = (req, res = response) => {
 
-    console.log(req.files);
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({ msg: 'No hay archivos que subir' });
     }
