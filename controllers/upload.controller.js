@@ -1,39 +1,31 @@
 const { response } = require('express');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+const { uploadFileHelper } = require('../helpers');
 
-const uploadFile = (req, res = response) => {
+const uploadFile = async (req, res = response) => {
 
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({ msg: 'No hay archivos que subir' });
     }
 
-    if (!req.files.file) {
-        return res.status(400).json({ msg: 'No hay archivos que subir' });
+    try {
+        //const fileName = await uploadFileHelper(req.files, ['txt', 'md'],'text');
+        const fileName = await uploadFileHelper(req.files, undefined, 'img')
+
+        res.json({ msg: `El archivo se subió correctamente: ${fileName}` })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ msg: 'Ocurrio un error al subir el archivo' })
     }
-
-    const { file } = req.files;
-    const nameSplitted = file.name.split('.');
-    const fileExt = nameSplitted[nameSplitted.length - 1]
-
-    const extensions = ['png', 'jpg', 'jpeg', 'gif'];
-    if (!extensions.includes(fileExt)) {
-        return res.status(400).json({ msg: 'Extension de archivo no permitida' })
-    }
-
-    const tempName = uuidv4() + '.' + fileExt;
-
-
-    const uploadPath = path.join(__dirname, '../uploads', tempName);
-
-    file.mv(uploadPath, (err) => {
-        if (err)
-            return res.status(500).json({ msg: 'Ocurrió un error al subir un archivo', err });
-
-        res.json({ msg: 'File uploaded!' });
-    });
 }
 
+const updateImage = async (req, res = response) => {
+
+    const {id, collection} = req.params; 
+
+    res.json({msg: 'pepe'});
+}
+ 
 module.exports = {
-    uploadFile
+    uploadFile,
+    updateImage
 }
