@@ -1,5 +1,6 @@
 const { response } = require('express');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 const uploadFile = (req, res = response) => {
 
@@ -14,21 +15,24 @@ const uploadFile = (req, res = response) => {
 
     const { file } = req.files;
     const nameSplitted = file.name.split('.');
-    const extFile = nameSplitted[nameSplitted.length - 1]
+    const fileExt = nameSplitted[nameSplitted.length - 1]
 
     const extensions = ['png', 'jpg', 'jpeg', 'gif'];
-    if (!extensions.includes(extFile)) {
+    if (!extensions.includes(fileExt)) {
         return res.status(400).json({ msg: 'Extension de archivo no permitida' })
     }
-    return res.json(extFile)
-    // const uploadPath = path.join( __dirname, '../uploads', file.name);
 
-    // file.mv(uploadPath, (err) => {
-    //     if (err)
-    //         return res.status(500).json({msg: 'Ocurrió un error al subir un archivo', err});
+    const tempName = uuidv4() + '.' + fileExt;
 
-    //     res.json({msg: 'File uploaded!'});
-    // });
+
+    const uploadPath = path.join(__dirname, '../uploads', tempName);
+
+    file.mv(uploadPath, (err) => {
+        if (err)
+            return res.status(500).json({ msg: 'Ocurrió un error al subir un archivo', err });
+
+        res.json({ msg: 'File uploaded!' });
+    });
 }
 
 module.exports = {
