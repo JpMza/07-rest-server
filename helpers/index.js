@@ -8,5 +8,5 @@ module.exports = {
     ...dbValidator,
     googleVerify,
     jwtGenerator,
-    uploadFileHelper
+    ...uploadFileHelper
 }

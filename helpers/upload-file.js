@@ -1,6 +1,9 @@
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
+
+const filesEmpty = files => !files || Object.keys(files).length === 0 || !files.file;
+
 const uploadFileHelper = (files, validExtensions = ['png', 'jpg', 'jpeg', 'gif'], folder = '') => {
 
 
@@ -31,4 +34,7 @@ const uploadFileHelper = (files, validExtensions = ['png', 'jpg', 'jpeg', 'gif']
 
 }
 
-module.exports = uploadFileHelper;
+module.exports = {
+    uploadFileHelper,
+    filesEmpty
+};

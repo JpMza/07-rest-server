@@ -1,9 +1,11 @@
 const { response } = require('express');
-const { uploadFileHelper } = require('../helpers');
+const { uploadFileHelper, filesEmpty } = require('../helpers');
+const { User, Product } = require('../models');
+
 
 const uploadFile = async (req, res = response) => {
 
-    if (!req.files || Object.keys(req.files).length === 0) {
+    if (filesEmpty(req.files)) {
         return res.status(400).json({ msg: 'No hay archivos que subir' });
     }
 
@@ -20,11 +22,42 @@ const uploadFile = async (req, res = response) => {
 
 const updateImage = async (req, res = response) => {
 
-    const {id, collection} = req.params; 
+    if (filesEmpty(req.files)) {
+        return res.status(400).json({ msg: 'No hay archivos que subir' });
+    }
 
-    res.json({msg: 'pepe'});
+    const { id, collection } = req.params;
+
+    let model;
+
+    switch (collection) {
+        case 'users':
+            model = await User.findById(id);
+            if (!model) {
+                return res.status(400).json({ msg: `No existe usuario con el id : ${id}` })
+            }
+
+            break;
+        case 'products':
+            model = await Product.findById(id);
+            if (!model) {
+                return res.status(400).json({ msg: `No existe producto con el id : ${id}` })
+            }
+
+            break;
+
+        default:
+            return res.status(400).json({ msg: 'Ocurrio un error' })
+    }
+    const fileName = await uploadFileHelper(req.files, undefined, collection)
+
+    model.img = fileName
+
+    await model.save()
+
+    res.json({ model });
 }
- 
+
 module.exports = {
     uploadFile,
     updateImage
