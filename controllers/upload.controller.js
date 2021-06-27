@@ -1,13 +1,10 @@
 const { response } = require('express');
-const { uploadFileHelper, filesEmpty } = require('../helpers');
+const { uploadFileHelper } = require('../helpers');
 const { User, Product } = require('../models');
-
+const path = require('path');
+const fs = require('fs');
 
 const uploadFile = async (req, res = response) => {
-
-    if (filesEmpty(req.files)) {
-        return res.status(400).json({ msg: 'No hay archivos que subir' });
-    }
 
     try {
         //const fileName = await uploadFileHelper(req.files, ['txt', 'md'],'text');
@@ -21,10 +18,6 @@ const uploadFile = async (req, res = response) => {
 }
 
 const updateImage = async (req, res = response) => {
-
-    if (filesEmpty(req.files)) {
-        return res.status(400).json({ msg: 'No hay archivos que subir' });
-    }
 
     const { id, collection } = req.params;
 
@@ -49,6 +42,21 @@ const updateImage = async (req, res = response) => {
         default:
             return res.status(400).json({ msg: 'Ocurrio un error' })
     }
+
+    try {
+        if (model.img) {
+            const imagePath = path.join(__dirname, '../uploads', collection, model.img);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'Ocurrió un error al eliminar imagen previa'
+        })
+    }
+
     const fileName = await uploadFileHelper(req.files, undefined, collection)
 
     model.img = fileName
