@@ -66,7 +66,57 @@ const updateImage = async (req, res = response) => {
     res.json({ model });
 }
 
+const showImage = async (req, res = response) => {
+
+    const { id, collection } = req.params;
+
+    let model;
+    const noImagePath = path.join(__dirname, '../assets/no-image.jpg');
+    const noImagePathExists = fs.existsSync(noImagePath);
+
+    switch (collection) {
+        case 'users':
+            model = await User.findById(id);
+            if (!model && noImagePathExists) {
+                return res.sendFile(noImagePath);
+            }
+
+            break;
+        case 'products':
+            model = await Product.findById(id);
+            if (!model && noImagePathExists) {
+                return res.sendFile(noImagePath);
+            }
+
+            break;
+
+        default:
+            return res.status(400).json({ msg: 'No se encontró imagen' })
+    }
+
+    try {
+        if (model.img) {
+            const imagePath = path.join(__dirname, '../uploads', collection, model.img);
+            if (fs.existsSync(imagePath)) {
+                return res.sendFile(imagePath);
+            }
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'Ocurrió un error al eliminar imagen previa'
+        })
+    }
+
+    if (noImagePathExists) {
+        return res.sendFile(noImagePath);
+    }
+
+    res.json({ msg: 'Nada encontrado' });
+}
+
 module.exports = {
     uploadFile,
-    updateImage
+    updateImage,
+    showImage
 }
