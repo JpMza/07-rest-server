@@ -30,11 +30,11 @@ const userExistById = async (id) => {
 }
 
 const categoryExistById = async (id) => {
-    
+
     if (!id) {
         throw new Error('La categoria es requerida');
     }
-    
+
     const categoryExist = await Category.findById(id);
     if (!categoryExist) {
         throw new Error(`No existe la categoria con id ${id}`)
@@ -72,6 +72,15 @@ const productAlreadyDeleted = async (id) => {
     }
 }
 
+const allowedCollections = (collection = '', allowedCollections = []) => {
+
+    const isIncluded = allowedCollections.includes(collection);
+    if (!isIncluded) {
+        throw new Error(`La colección ${collection} no es permitida, ${allowedCollections}`)
+    }
+    return true;
+}
+
 module.exports = {
     isValidRole,
     isEmailRepeated,
@@ -79,5 +88,6 @@ module.exports = {
     categoryExistById,
     productExistByName,
     productExistById,
-    productAlreadyDeleted
+    productAlreadyDeleted,
+    allowedCollections
 }
